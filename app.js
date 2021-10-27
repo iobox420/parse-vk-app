@@ -12,50 +12,56 @@ const vkuri = (obj) => {
 };
 
 const main = async () => {
-  /*  await startConnectionToDB();*/
+  await startConnectionToDB();
 
+  for (let i = 0; i < 2; i++) {
+    let offset = 0;
+    let count = 0;
+    setTimeout(async () => {
+      console.log(offset);
+      /*
 
+      */
 
-
-  for (let i = 0; i < 5; i++) {
-    setTimeout(() => {
-
-      fetch(
-          vkuri({
-            method: "wall.get",
-            domain: "moshenniki74",
-            offset: 10000,
-            count: 3,
-            filter: "owner",
-            extended: 1,
-            v: 5.131,
-          })
+      console.log("start fetch");
+      await fetch(
+        vkuri({
+          method: "wall.get",
+          domain: "moshenniki74",
+          offset: offset,
+          count: 3,
+          filter: "owner",
+          extended: 1,
+          v: 5.131,
+        })
       )
-          .then((r) => {
-            return r.json();
-          })
-          .then((res) => {
-            let temp = res.response.items;
+        .then((r) => {
+          return r.json();
+        })
+        .then((res) => {
+          let temp = res.response.items;
 
-            if (temp.length === 0) {
-              throw ApiError.ArrayEnd();
-            }
+          if (temp.length === 0) {
+            throw ApiError.ArrayEnd();
+          }
 
-            temp.forEach((cur, i) => {
-              vkModel
-                  .create(cur)
-                  .then((r) => console.log(r))
-                  .catch((error) => {
-                    console.log(error);
-                  });
-            });
+          temp.forEach(async (cur, is) => {
+            await vkModel
+              .create(cur)
+              .then((r) => console.log(is, "end save to db"))
+              .catch((error) => {
+                console.log(error);
+              });
           });
-    },1000)
+        });
+
+      offset = offset + 3;
+      /*
+
+      */
+    }, 1000);
   }
 };
-
-
-
 
 main();
 /*
